@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CNOOC 0883.HK — Brent-linked daily earnings &amp; dividend calculator</title>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { font-size:16px; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px 72px; }
+  header.top { padding: 52px 0 10px; border-bottom: 2px solid var(--ink); margin-bottom: 24px; }
+  .kicker { font-family: var(--mono); text-transform: uppercase; letter-spacing: .14em;
+            font-size: 11px; color: var(--red); font-weight: 700; }
+  h1 { font-size: 33px; line-height: 1.2; margin: 10px 0 8px; font-weight: 700; }
+  .dek { font-style: italic; color: var(--ink-md); max-width: 720px; }
+  .quote-bar { display:flex; flex-wrap:wrap; gap:26px; align-items:center;
+    background: var(--paper-hi); border:1px solid var(--line); padding:16px 20px; margin:22px 0 6px; }
+  .qcap { font-family: var(--mono); text-transform: uppercase; letter-spacing:.1em; font-size:10px; color:var(--ink-lo); }
+  .quote-bar .q { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .quote-bar .q b { font-size: 26px; }
+  .btn { font-family: var(--mono); font-size:11px; text-transform: uppercase; letter-spacing:.08em;
+    border:1.5px solid var(--ink); background:var(--paper); padding:6px 14px; cursor:pointer; border-radius:3px; }
+  .btn:hover { background: var(--ink); color:#fff; }
+  .seg { display:flex; border:1.5px solid var(--ink); border-radius:3px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    padding:6px 14px; background:var(--paper); border:none; cursor:pointer; color:var(--ink); }
+  .seg button.on { background:var(--ink); color:#fff; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap: 30px; margin-top: 22px; }
+  @media (max-width: 820px){ .grid { grid-template-columns: 1fr; } }
+  .panel h3, .results h3 { font-family: var(--mono); text-transform: uppercase; letter-spacing:.12em;
+    font-size: 11px; color: var(--ink-md); border-bottom: 1px solid var(--line); padding-bottom:6px; margin-bottom:12px; }
+  label { display:block; font-family: var(--mono); font-size:10px; text-transform: uppercase;
+    letter-spacing:.1em; color: var(--ink-lo); margin: 14px 0 4px; }
+  input[type=number] { width:100%; font-family: var(--mono); font-size:15px;
+    padding:7px 9px; border:1px solid var(--line); border-radius:3px; color: var(--ink); }
+  input:focus { outline: 2px solid var(--red); outline-offset: -1px; }
+  .hint { font-size:12px; color: var(--ink-lo); margin-top:3px; font-style: italic; }
+  .krow { display:flex; justify-content:space-between; align-items:baseline; gap:12px; padding:9px 0; border-bottom:1px solid var(--line-lo); }
+  .krow .k { font-size:13.5px; color: var(--ink-md); }
+  .krow .n { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight:700; text-align:right; }
+  .krow.hero { background: var(--paper-hi); padding: 12px 12px; border: 1px solid var(--line); margin-bottom: 4px;}
+  .krow.hero .n { font-size: 27px; color: var(--red); }
+  .krow.hero2 .n { font-size: 20px; color: var(--blue); }
+  figure.plate { margin: 32px 0 6px; }
+  .fig-title { font-size: 19px; font-weight: 700; }
+  canvas#chart { width:100%; height: 390px; display:block; border:1px solid var(--line); }
+  .pill { display:inline-block; font-family:var(--mono); font-size:10px; letter-spacing:.06em;
+    border:1px solid var(--line); border-radius:20px; padding:2px 9px; margin-left:8px; color:var(--ink-md); }
+  .pill.live { border-color: var(--green); color: var(--green); }
+  .pill.stale { border-color: var(--copper); color: var(--copper); }
+  .tick { font-family: var(--mono); font-size: 10px; color: var(--ink-lo); margin-top: 4px; }
+
+  /* ── ad slots ── */
+  .ad-slot { margin: 22px 0; border: 1px dashed var(--line); background: var(--paper-hi);
+    display:flex; align-items:center; justify-content:center; min-height: 90px; }
+  .ad-slot .ad-label { position:absolute; top:-9px; left:10px; background:var(--paper);
+    font-family:var(--mono); font-size:9px; letter-spacing:.12em; color:var(--ink-lo); padding:0 6px; text-transform:uppercase; }
+  .ad-wrap { position:relative; }
+  .ad-placeholder { text-align:center; padding:18px 12px; }
+  .ad-placeholder .t { font-family:var(--mono); font-size:11px; color:var(--ink-lo); text-transform:uppercase; letter-spacing:.1em; }
+  .ad-placeholder .s { font-size:12px; color:var(--ink-lo); font-style:italic; margin-top:4px; max-width:520px; margin-left:auto; margin-right:auto;}
+  .ad-placeholder a { color: var(--blue); }
+  .ad-rect { min-height: 250px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="kicker">Energy · Hong Kong E&amp;P · Interactive model</div>
+    <h1>CNOOC (0883.HK): how much does your holding earn per day?</h1>
+    <p class="dek">Enter your share count.</p>
+  </header>
+
+  <!-- AD SLOT 1: leaderboard below header -->
+  <div class="ad-wrap"><span class="ad-label">Advertisement</span>
+    <div class="ad-slot" id="adTop">
+      <div class="ad-placeholder">
+        <div class="t">Ad space — Google AdSense ready</div>
+        <div class="s">Set your publisher ID in <code>js/ads.js</code> (<code>ADSENSE_CLIENT</code> / <code>ADSENSE_SLOT_TOP</code>) after AdSense approval to serve live ads here.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-bar">
+    <div>
+      <div class="qcap">Brent crude (US$/bbl)</div>
+      <div class="q"><b id="brentNow">—</b><span id="quoteTag" class="pill stale">loading…</span>
+      <div class="tick" id="brentTs"></div></div>
+    </div>
+    <div>
+      <div class="qcap">0883.HK last (HK$)</div>
+      <div class="q"><b id="pxNow">22.98</b><span id="pxTag" class="pill stale">…</span>
+      <div class="tick" id="pxTs">Wind, 28 Jul 2026 · editable below</div></div>
+    </div>
+    <div style="margin-left:auto;"><button class="btn" id="refreshBtn">↻ Refresh quotes</button></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Inputs</h3>
+      <label for="shares">Your shares of 0883.HK</label>
+      <input type="number" id="shares" value="100000" min="0" step="1000">
+      <div class="hint">Lot size 1,000. 100,000 shares ≈ 0.00021% of the 47.5bn shares in issue.</div>
+
+      <input type="hidden" id="brent" value="86.0">
+
+      <label for="payout">Dividend payout ratio (%)</label>
+      <input type="number" id="payout" value="45" min="0" max="100" step="1">
+      <div class="hint">Company-guided floor for 2025–2027 is 45%.</div>
+
+      <label for="px">Share price for yield calc (HK$)</label>
+      <input type="number" id="px" value="22.98" step="0.01">
+    </div>
+
+    <div class="results">
+      <h3>Your holding, accrued daily</h3>
+      <div class="krow hero"><span class="k">Net profit accruing to you — <b>per day</b></span><span class="n" id="earnDay">—</span></div>
+      <div class="krow hero2"><span class="k">Dividend — per day equivalent</span><span class="n" id="divDay">—</span></div>
+      <div class="krow"><span class="k">Earnings — per year (annualised)</span><span class="n" id="earnYr">—</span></div>
+      <div class="krow"><span class="k">Dividend — per year</span><span class="n" id="divYr">—</span></div>
+      <div class="krow"><span class="k">Dividend yield at HK$<span id="pxEcho">22.98</span></span><span class="n" id="yield">—</span></div>
+      <div class="krow"><span class="k">Total daily value accrual (earnings basis)</span><span class="n" id="totDay">—</span></div>
+    </div>
+  </div>
+
+  <!-- AD SLOT 2: in-content before chart -->
+  <div class="ad-wrap"><span class="ad-label">Advertisement</span>
+    <div class="ad-slot" id="adMid">
+      <div class="ad-placeholder">
+        <div class="t">Ad space — in-content</div>
+        <div class="s">Responsive display unit. Configure <code>ADSENSE_SLOT_MID</code> in <code>js/ads.js</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <figure class="plate">
+    <div class="fig-title">Daily earnings and dividend accrual across the Brent curve</div>
+    <canvas id="chart"></canvas>
+  </figure>
+
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/ads.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
