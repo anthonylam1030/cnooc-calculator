@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PetroChina 0857 Investment Report</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar"><div><div class="eyebrow">PETROCHINA · 0857.HK</div><h1>中國石油 Investment Report</h1><p>2022Q1–2026Q2 · 18季綜合油企盈利模型</p></div><button id="refreshQuotes">更新報價</button></header>
+<main>
+<section class="grid market-grid">
+<article class="card"><div class="label">中國石油 0857.HK</div><div id="stockPrice" class="quote">—</div><div id="stockChange" class="sub">讀取中</div><div id="stockMeta" class="tiny">—</div></article>
+<article class="card"><div class="label">Brent</div><div id="brentPrice" class="quote">—</div><div id="brentChange" class="sub">讀取中</div><div id="brentMeta" class="tiny">—</div></article>
+<article class="card"><div class="label">CNY/HKD</div><div id="fxPrice" class="quote">—</div><div id="fxMeta" class="tiny">—</div></article>
+</section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">BRENT SCENARIO</div><h2>油價敏感度</h2></div><div class="scenario-value">US$<span id="scenarioValue">80</span></div></div><input id="brentSlider" type="range" min="60" max="120" step="1" value="80"><div class="button-row" id="brentButtons"></div></section>
+<section class="grid kpi-grid"><article class="card"><div class="label">年度扣非盈利</div><div id="annualProfit" class="kpi">—</div></article><article class="card"><div class="label">EPS</div><div id="epsValue" class="kpi">—</div></article><article class="card"><div class="label">每股派息</div><div id="dpsValue" class="kpi">—</div><div id="dpsHkd" class="tiny">—</div></article><article class="card"><div class="label">市盈率</div><div id="peValue" class="kpi">—</div></article><article class="card"><div class="label">股息率</div><div id="yieldValue" class="kpi">—</div></article></section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">18 QUARTERS</div><h2>18季扣非盈利</h2></div></div><canvas id="earningsChart" height="280"></canvas></section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">SEGMENTS</div><h2>四大分部盈利</h2></div></div><canvas id="segmentChart" height="320"></canvas></section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">NATURAL GAS</div><h2>天然氣業務盈利變化</h2></div></div><canvas id="gasProfitChart" height="300"></canvas><div class="grid season-grid"><article class="card"><div class="label">Q1平均</div><div id="q1Avg" class="kpi small">—</div></article><article class="card"><div class="label">Q2平均</div><div id="q2Avg" class="kpi small">—</div></article><article class="card"><div class="label">Q3平均</div><div id="q3Avg" class="kpi small">—</div></article><article class="card"><div class="label">Q4平均</div><div id="q4Avg" class="kpi small">—</div></article></div></section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">SENSITIVITY</div><h2>Brent US$60–120</h2></div></div><div class="table-wrap"><table id="sensitivityTable"><thead><tr><th>Brent</th><th>扣非盈利</th><th>EPS</th><th>每股派息</th><th>每US$10增量</th></tr></thead><tbody></tbody></table></div></section>
+<section class="section"><div class="section-head"><div><div class="eyebrow">DATABASE</div><h2>18季歷史資料庫</h2></div></div><div class="table-wrap"><table id="historyTable"><thead><tr><th>季度</th><th>上游</th><th>煉化</th><th>銷售</th><th>天然氣</th><th>扣非盈利</th><th>產量 mmboe</th></tr></thead><tbody></tbody></table></div></section>
+<section class="section notes"><h2>模型說明</h2><p>中國石油屬綜合油企：上游對Brent呈正beta；特別油收益金與部分下游盈利形成抵銷；天然氣銷售主要受季節性、銷量及採購成本影響。情景盈利為模型估算，不是公司指引。</p></section>
+</main><script src="/app.js"></script>
+</body></html>
