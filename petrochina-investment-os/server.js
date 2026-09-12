@@ -14,11 +14,16 @@ async function yahoo(symbol){
   const meta=result.meta||{},closes=(result.indicators?.quote?.[0]?.close||[]).filter(Number.isFinite);
   return{symbol,price:meta.regularMarketPrice??closes.at(-1)??null,previousClose:meta.chartPreviousClose??meta.previousClose??closes.at(-2)??null,currency:meta.currency||null,marketTime:meta.regularMarketTime?meta.regularMarketTime*1000:Date.now()};
 }
-function send(res,status,body,type='text/plain; charset=utf-8'){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store'});res.end(body)}
+function send(res,status,body,type='text/plain; charset=utf-8',extra={}){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store',...extra});res.end(body)}
 function staticFile(req,res){
-  const reqPath=req.url==='/'?'/index.html':decodeURIComponent(req.url.split('?')[0]);
-  const filePath=path.normalize(path.join(publicDir,reqPath));
-  if(!filePath.startsWith(publicDir))return send(res,403,'Forbidden');
+  const rawPath=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+  let reqPath=rawPath;
+  if(reqPath==='/') reqPath='/a/index.html';
+  else if(reqPath==='/a') return send(res,302,'','text/plain; charset=utf-8',{Location:'/a/'});
+  else if(reqPath==='/b') return send(res,302,'','text/plain; charset=utf-8',{Location:'/b/'});
+  else if(reqPath.endsWith('/')) reqPath+='index.html';
+  const filePath=path.resolve(publicDir,'.'+reqPath);
+  if(!filePath.startsWith(path.resolve(publicDir)+path.sep))return send(res,403,'Forbidden');
   fs.readFile(filePath,(err,data)=>{if(err)return send(res,404,'Not found');const ext=path.extname(filePath);const types={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8'};send(res,200,data,types[ext]||'application/octet-stream')});
 }
 const server=http.createServer(async(req,res)=>{
