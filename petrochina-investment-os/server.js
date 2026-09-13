@@ -6,13 +6,19 @@ const __dirname=path.dirname(fileURLToPath(import.meta.url));
 const publicDir=path.join(__dirname,'public');
 const port=process.env.PORT||3000;
 async function yahoo(symbol){
-  const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`;
+  const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=10d`;
   const response=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0'},signal:AbortSignal.timeout(7000)});
   if(!response.ok)throw new Error(`Yahoo ${symbol}: ${response.status}`);
   const json=await response.json(),result=json?.chart?.result?.[0];
   if(!result)throw new Error(`Yahoo ${symbol}: no result`);
   const meta=result.meta||{},closes=(result.indicators?.quote?.[0]?.close||[]).filter(Number.isFinite);
-  return{symbol,price:meta.regularMarketPrice??closes.at(-1)??null,previousClose:meta.chartPreviousClose??meta.previousClose??closes.at(-2)??null,currency:meta.currency||null,marketTime:meta.regularMarketTime?meta.regularMarketTime*1000:Date.now()};
+  const latestClose=closes.at(-1)??null;
+  const priorClose=closes.length>=2?closes.at(-2):null;
+  const price=meta.regularMarketPrice??latestClose;
+  // Use the latest two actual trading-session closes for previousClose. Yahoo's
+  // chartPreviousClose/previousClose metadata can lag after weekends/holidays.
+  const previousClose=priorClose??meta.previousClose??meta.chartPreviousClose??null;
+  return{symbol,price,previousClose,currency:meta.currency||null,marketTime:meta.regularMarketTime?meta.regularMarketTime*1000:Date.now()};
 }
 function send(res,status,body,type='text/plain; charset=utf-8',extra={}){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store',...extra});res.end(body)}
 function staticFile(req,res){
