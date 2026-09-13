@@ -1,0 +1,1 @@
+(()=>{const el=document.querySelector('#scenarioValue');if(!el)return;const round=()=>{const v=Number(el.textContent);if(Number.isFinite(v))el.textContent=String(Math.round(v));};round();new MutationObserver(round).observe(el,{childList:true,characterData:true,subtree:true});})();
